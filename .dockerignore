@@ -1,0 +1,7 @@
+**/__pycache__
+**/.yolo_venv
+**/.git
+**/.vscode
+**/*.log
+Dockerfile
+docker-compose.yml
