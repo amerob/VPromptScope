@@ -14,10 +14,31 @@ st.set_page_config(
     page_icon="./images/object.png"
 )
 
+# sidebar to control threshold
+with st.sidebar:
+    st.header("Threshold Settings")
+    confidence = st.slider(
+        "Confidence Threshold",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.4,
+        step=0.01
+    )
+    class_score = st.slider(
+        "Class Score Threshold",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.25,
+        step=0.01
+    )
+
+# loading the yolo model
 with st.spinner("loading the YOLO model, please wait..."):
     yolo = YOLO_Pred(
         onnx_model="./models/best_model.onnx",
-        data_yaml="./models/data.yaml"
+        data_yaml="./models/data.yaml",
+        confidence=confidence,
+        class_score=class_score
     )
 
 classes = [
@@ -78,6 +99,8 @@ def process_video(uploaded_file, selected_classes):
             if not ret:
                 break
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            yolo.confidence = confidence
+            yolo.class_score = class_score
             pred_frame = yolo.predictions(frame_rgb, classes_to_detect=selected_classes)
             pred_frame_bgr = cv2.cvtColor(pred_frame, cv2.COLOR_RGB2BGR)
             out.write(pred_frame_bgr)
@@ -90,7 +113,7 @@ def process_video(uploaded_file, selected_classes):
 
         cmd = [
             "ffmpeg",
-            "-y",  # to overwrite the outputfile
+            "-y",  # to overwr the outputfile
             "-i", opencv_output_path,
             "-c:v", "libx264",
             "-preset", "fast",
@@ -116,7 +139,7 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            st.info("Uploaded File")
+            st.info("uploaded File")
             if file_type == "image":
                 image_obj = Image.open(file_obj)
                 st.image(image_obj)
@@ -124,7 +147,7 @@ def main():
                 st.video(file_obj)
 
         with col2:
-            st.subheader("File Details")
+            st.subheader("file Details")
             st.json(details)
             # class selection
             selected_classes = st.multiselect("Select classes to detect:", classes, default=classes)
@@ -135,6 +158,9 @@ def main():
                 if file_type == "image":
                     image_obj = Image.open(file_obj)
                     image_array = np.array(image_obj)
+                    # updating thresholds
+                    yolo.confidence = confidence
+                    yolo.class_score = class_score
                     pred_img = yolo.predictions(image_array, classes_to_detect=selected_classes)
                     pred_img_obj = Image.fromarray(pred_img)
                     st.subheader("Detected objects in image")
