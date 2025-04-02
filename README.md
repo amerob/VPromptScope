@@ -6,17 +6,17 @@ The app uses the **YOLOv8** pre-trained model for transfer learning on 20 differ
 
 ## Features
 
--✅ **Custom Class Selection:**  
+✅ **Custom Class Selection:**  
   Choose the classes you want to detect using the prompt for focused object detection.
 
--✅ **Adjustable Thresholds:**  
+✅ **Adjustable Thresholds:**  
   - **Confidence Threshold:**  
     Adjust the confidence level to control the balance between precision and recall.
   
   - **Class Score Threshold:**  
     Set the minimum class probability required for detection.
 
--✅ **Real-Time Object Detection:**  
+✅ **Real-Time Object Detection:**  
   Process live video streams using the above adjustable parameters.
 
 ## Note
