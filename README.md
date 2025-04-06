@@ -1,6 +1,6 @@
 # YOLO Promot-based and Customized Object Detection Web App
 
-- 📱 [App Link](https://yolo-prompted-app.onrender.com)
+- 📱 [App Link](https://yolo-prompt-based-detection-app-production.up.railway.app/)
 
 The app uses the **YOLOv8** pre-trained model for transfer learning on 20 different objects, supported by a prompt to detect custom classes.
 
