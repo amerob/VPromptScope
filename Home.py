@@ -15,8 +15,8 @@ import streamlit as st
 st.set_page_config(
     page_title="YOLO V8 Prompt-based Object Detection App",
     layout="wide",
-    page_icon='./images/home.png'
-    # page_icon = '📡'
+    page_icon = '🧠'
+    # page_icon='./images/home.png'
 )
 
 
