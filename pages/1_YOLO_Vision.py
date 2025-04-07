@@ -11,7 +11,7 @@ import os
 st.set_page_config(
     page_title="YOLO Object Detection",
     layout="wide",
-    page_icon="./images/object.png"
+    page_icon="👁️"
 )
 
 # sidebar to control threshold
