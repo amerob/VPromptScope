@@ -7,14 +7,12 @@ import tempfile
 import subprocess
 import os
 
-# page configuration
 st.set_page_config(
     page_title="YOLO Object Detection",
     layout="wide",
     page_icon="👁️"
 )
 
-# sidebar to control threshold
 with st.sidebar:
     st.header("Threshold Settings")
     confidence = st.slider(
@@ -32,8 +30,7 @@ with st.sidebar:
         step=0.01
     )
 
-# loading the yolo model
-with st.spinner("loading the YOLO model, please wait..."):
+with st.spinner("Loading the YOLO model, please wait..."):
     yolo = YOLO_Pred(
         onnx_model="./models/best_model.onnx",
         data_yaml="./models/data.yaml",
@@ -47,8 +44,8 @@ classes = [
     "diningtable", "bus", "pottedplant", "bird", "dog"
 ]
 
+
 def upload_file():
-    """Handles file upload and validates the file type."""
     file = st.file_uploader(
         label="Upload an Image or Video",
         type=["png", "jpeg", "jpg", "mp4", "avi", "mov"]
@@ -69,10 +66,10 @@ def upload_file():
             st.success("Valid video file type (MP4, AVI, MOV)")
             return {"type": "video", "file": file, "details": file_details}
         else:
-            st.error("Invalid file type. please upload PNG, JPG, JPEG, MP4, AVI, MOV files only.")
+            st.error("Invalid file type. Please upload PNG, JPG, JPEG, MP4, AVI, or MOV files only.")
             return None
 
-# capture image from camera
+#capture image from camera
 def capture_from_camera():
     captured_file = st.camera_input("capture an image")
     if captured_file is not None:
@@ -81,12 +78,12 @@ def capture_from_camera():
             "filetype": "image/png",
             "filesize": f"{len(captured_file.getvalue()) / (1024 ** 2):,.2f} MB"
         }
-        st.success("Image captured successfully from camera")
+        st.success("image captured successfully from camera!")
         return {"type": "image", "file": captured_file, "details": file_details}
     return None
 
-def process_video(uploaded_file, selected_classes):
 
+def process_video(uploaded_file, selected_classes):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_input:
             tmp_input.write(uploaded_file.getvalue())
@@ -106,7 +103,7 @@ def process_video(uploaded_file, selected_classes):
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         out = cv2.VideoWriter(opencv_output_path, fourcc, fps, (width, height))
 
-        # frame by frame processing
+        # Process video frame by frame
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -126,41 +123,44 @@ def process_video(uploaded_file, selected_classes):
 
         cmd = [
             "ffmpeg",
-            "-y",  # to overwr the outputfile
+            "-y",  
             "-i", opencv_output_path,
             "-c:v", "libx264",
             "-preset", "fast",
             "-crf", "23",
-            "-movflags", "+faststart",  # to enable streaming
+            "-movflags", "+faststart",  
             ffmpeg_output_path
         ]
         subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
         return ffmpeg_output_path
     except Exception as e:
         st.error(f"Error processing video: {e}")
         return None
 
+
 def main():
-    uploaded_file = upload_file()
+    st.title("YOLO Object Detection")
+
+    # choose the source type
     source_option = st.radio(
-        "Select Image Source:",
-        ("Upload file", "Camera Capture")
+        "Select Image/Video Source:",
+        ("Upload File", "Camera Capture")
     )
-    
-    if source_option == "upload File":
+
+    if source_option == "Upload File":
         input_data = upload_file()
     else:
         input_data = capture_from_camera()
 
-if input_data:
+    if input_data:
         file_type = input_data["type"]
         file_obj = input_data["file"]
         details = input_data["details"]
+
         col1, col2 = st.columns(2)
 
         with col1:
-            st.info("uploaded File")
+            st.info("Input Preview")
             if file_type == "image":
                 image_obj = Image.open(file_obj)
                 st.image(image_obj)
@@ -168,29 +168,30 @@ if input_data:
                 st.video(file_obj)
 
         with col2:
-            st.subheader("file Details")
+            st.subheader("File Details")
             st.json(details)
             # class selection
             selected_classes = st.multiselect("Select classes to detect:", classes, default=classes)
-            button = st.button("Get detection from YOLO")
+            button = st.button("Run YOLO Detection")
 
         if button:
             with st.spinner("Detecting objects, please wait..."):
                 if file_type == "image":
                     image_obj = Image.open(file_obj)
                     image_array = np.array(image_obj)
-                    # updating thresholds
+                    # update thresholds
                     yolo.confidence = confidence
                     yolo.class_score = class_score
                     pred_img = yolo.predictions(image_array, classes_to_detect=selected_classes)
                     pred_img_obj = Image.fromarray(pred_img)
-                    st.subheader("Detected objects in image")
+                    st.subheader("Detected Objects in Image")
                     st.image(pred_img_obj)
                 elif file_type == "video":
                     output_path = process_video(file_obj, selected_classes)
                     if output_path:
-                        st.subheader("Detected objects in video")
+                        st.subheader("Detected Objects in Video")
                         st.video(output_path)
+
 
 if __name__ == "__main__":
     main()
