@@ -8,7 +8,7 @@ import subprocess
 import os
 
 st.set_page_config(
-    page_title="YOLO Object Detection",
+    page_title="YOLO Vision",
     layout="wide",
     page_icon="👁️"
 )
@@ -139,7 +139,7 @@ def process_video(uploaded_file, selected_classes):
 
 
 def main():
-    st.title("YOLO Object Detection")
+    st.title("YOLO Vision")
 
     # choose the source type
     source_option = st.radio(
