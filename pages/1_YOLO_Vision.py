@@ -72,6 +72,19 @@ def upload_file():
             st.error("Invalid file type. please upload PNG, JPG, JPEG, MP4, AVI, MOV files only.")
             return None
 
+# capture image from camera
+def capture_from_camera():
+    captured_file = st.camera_input("capture an image")
+    if captured_file is not None:
+        file_details = {
+            "filename": "captured_image.png",
+            "filetype": "image/png",
+            "filesize": f"{len(captured_file.getvalue()) / (1024 ** 2):,.2f} MB"
+        }
+        st.success("Image captured successfully from camera")
+        return {"type": "image", "file": captured_file, "details": file_details}
+    return None
+
 def process_video(uploaded_file, selected_classes):
 
     try:
@@ -130,12 +143,20 @@ def process_video(uploaded_file, selected_classes):
 
 def main():
     uploaded_file = upload_file()
+    source_option = st.radio(
+        "Select Image Source:",
+        ("Upload file", "Camera Capture")
+    )
+    
+    if source_option == "upload File":
+        input_data = upload_file()
+    else:
+        input_data = capture_from_camera()
 
-    if uploaded_file:
-        file_type = uploaded_file["type"]
-        file_obj = uploaded_file["file"]
-        details = uploaded_file["details"]
-
+if input_data:
+        file_type = input_data["type"]
+        file_obj = input_data["file"]
+        details = input_data["details"]
         col1, col2 = st.columns(2)
 
         with col1:
