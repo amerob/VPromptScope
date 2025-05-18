@@ -6,6 +6,7 @@ import cv2
 import tempfile
 import subprocess
 import os
+import imageio_ffmpeg
 
 st.set_page_config(
     page_title="YOLO Vision",
@@ -117,6 +118,8 @@ def process_video(uploaded_file, selected_classes):
 
         cap.release()
         out.release()
+        
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_output_ffmpeg:
             ffmpeg_output_path = tmp_output_ffmpeg.name
