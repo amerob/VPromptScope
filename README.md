@@ -3,7 +3,7 @@
 - 📱 [App Link](https://vpromptscope-production.up.railway.app/)
 
 The app uses the **YOLOv8** pre-trained model for transfer learning on 20 different objects, supported by a prompt to detect custom classes.
-
+> **Note**: The app is deployed on a platform where the deployment includes a limitation of **10 free sessions**. If the app is not working, it's likely because the session limit has been reached.
 ## Features
 
 ✅ **Custom Class Selection:**  
